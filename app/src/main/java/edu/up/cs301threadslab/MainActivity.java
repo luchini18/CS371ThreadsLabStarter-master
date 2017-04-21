@@ -19,6 +19,9 @@ public class MainActivity extends Activity
     private AnimationView myAV;
     private Button theButton;
     private SeekBar theSeekBar;
+    private MyThread myThread;
+    private StarAnimation starAnimation;
+    private int oldProgress = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +30,7 @@ public class MainActivity extends Activity
 
         //Setup the animation(s)
         myAV = (AnimationView)findViewById(R.id.animationArea);
-        myAV.addAnimation(new StarAnimation(myAV.getMyWidth(), myAV.getMyHeight()));
+        myAV.addAnimation(starAnimation = new StarAnimation(myAV.getMyWidth(), myAV.getMyHeight()));
 
         //Let me know when someone taps the button
         theButton = (Button)findViewById(R.id.button);
@@ -36,16 +39,22 @@ public class MainActivity extends Activity
         //Let me know when someone adjusts the seekbar
         theSeekBar = (SeekBar)findViewById(R.id.seekBar);
         theSeekBar.setOnSeekBarChangeListener(this);
-    }//onClick
+
+        myThread = new MyThread(myAV);
+        myThread.start();
+
+
+    }//onCreate
 
     @Override
     public void onClick(View v) {
-        myAV.postInvalidate();
+            myAV.postInvalidate();
+
     }
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
-        myAV.progressChange(seekBar.getProgress());
+       // myAV.progressChange(seekBar.getProgress());
         myAV.postInvalidate();
     }
 
@@ -53,5 +62,23 @@ public class MainActivity extends Activity
     @Override
     public void onStartTrackingTouch(SeekBar seekBar) {}
     @Override
-    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {}
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+        if (progress>oldProgress) {
+            starAnimation.addStar();
+            starAnimation.addStar();
+            starAnimation.addStar();
+            starAnimation.addStar();
+            starAnimation.addStar();
+            oldProgress = progress;
+        }
+        else{
+            starAnimation.removeStar();
+            starAnimation.removeStar();
+            starAnimation.removeStar();
+            starAnimation.removeStar();
+            starAnimation.removeStar();
+            oldProgress = progress;
+        }
+    }
 }
